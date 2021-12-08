@@ -14,10 +14,11 @@ public class NPC : MonoBehaviour
     void Awake()
     {
         motionData.go = this.gameObject;
-        motionData.target = this.GetComponent<Transform>().position;
+        motionData.target = motionData.transform.position;
         motionData.maxSpeed = maxSpeed;
         motionData.maxAngularSpeed = maxAngularSpeed;
         motionData.mass = mass;
+        motionData.momI = 0.004f;
         motionData.slowingRadius = slowingRadius;
     }
     void Update()
@@ -34,6 +35,10 @@ public class NPC : MonoBehaviour
                 Gizmos.DrawWireSphere(motionData.target, 0.5f);
                 Gizmos.color = Color.green;
                 Gizmos.DrawLine(motionData.transform.position, motionData.target);
+
+                Gizmos.color = Color.red; //next way point
+                Vector3 a = motionData.path.Peek();
+                Gizmos.DrawWireSphere(a, 0.8f);
             }
         }
         catch (Exception e)

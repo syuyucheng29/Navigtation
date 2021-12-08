@@ -11,6 +11,7 @@ public class Motion : MonoBehaviour
 
         try
         {
+            if(md.distance < tolerence)
                md.target = md.path.Pop();
         }
         catch (Exception e)
