@@ -23,7 +23,6 @@ public class Navigation
         m_Instance = this;
         ReadWP("Assets/WP.txt");
     }
-
     public void ReadWP(string txtPath)
     {
         StreamReader sr = new StreamReader(txtPath);
@@ -53,7 +52,7 @@ public class Navigation
                 nodeList[myInts[0]].neibors.Add(nodeList[myInts[i]]);
         }
     }
-    public Stack<Vector3> Reach(Vector3 end)
+    public Stack<Vector3> Move(Vector3 end)
     {
         Stack<Vector3> result = new Stack<Vector3>();
         result.Push(end);
