@@ -43,17 +43,15 @@ public class Manager : MonoBehaviour
                 npc.motionData.path = navigation.SearchPath(currentPosition, currentTarget);
             }
         }
-        r = new Ray(currentPosition, currentTarget);
-        if (distanceToGoal > npc.motionData.tolerence)
+        
+        if (distanceToGoal > npc.motionData.tolerence) 
         {
+            r = new Ray(currentPosition, currentTarget- currentPosition);
             distanceToGoal = (currentPosition - currentTarget).magnitude;
             if (!Physics.Raycast(r, out RaycastHit rh, 1000.0f, 1 << LayerMask.NameToLayer("Wall")))
             {
-                Debug.Log("Go straightly");
-                //why penetrate the wall?
                 npc.motionData.path = navigation.Reach(currentTarget);
             }
         }
-
     }
 }

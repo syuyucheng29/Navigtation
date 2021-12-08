@@ -101,7 +101,7 @@ public class Navigation
         {
             PathNode cNode = GetSmallestGNode();
 
-            if (cNode.fH < 1f)
+            if (cNode.fH < 0.05f)
             {
                 eNode = cNode;
                 break;
