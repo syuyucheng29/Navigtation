@@ -6,7 +6,7 @@ public class Manager : MonoBehaviour
 {
     Navigation navigation = new Navigation();
     public GameObject controlled;
-    public GameObject point;
+    //public GameObject point;
     public bool isSmoothing;
     NPC npc;
     Vector3 currentTarget;
@@ -16,11 +16,11 @@ public class Manager : MonoBehaviour
     private void Awake()
     {
         npc = controlled.GetComponent<NPC>();
-        for (int i = 0; i < navigation.nodeList.Count; i++)
-        {
-            GameObject gn = Instantiate(point, navigation.nodeList[i].Pos, Quaternion.identity);
-            gn.name = i + "";
-        }
+        //for (int i = 0; i < navigation.nodeList.Count; i++)
+        //{
+        //    GameObject gn = Instantiate(point, navigation.nodeList[i].Pos, Quaternion.identity);
+        //    gn.name = i + "";
+        //}
     }
     void Start()
     {
