@@ -24,10 +24,11 @@ public class Navigation
         ReadWP("Assets/WP.txt");
     }
 
-    public void ReadWP(string txtPath)
+    void ReadWP(string txtPath)
     {
         StreamReader sr = new StreamReader(txtPath);
-        Debug.Log(sr.ReadLine());
+        //Debug.Log(sr.ReadLine());
+        sr.ReadLine();
         string sline = "";
         //Read WP
         sline = sr.ReadLine();

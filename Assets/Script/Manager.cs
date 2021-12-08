@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class Manager : MonoBehaviour
 {
+
+    NPC npc;
     Navigation navigation = new Navigation();
     public GameObject controlled;
     public GameObject target;
-    public bool isSmoothing;
-    NPC npc;
-    bool isChange = false;
     Vector3 currentTarget;
     Vector3 previousTarget;
     Vector3 currentPosition;
