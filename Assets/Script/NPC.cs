@@ -18,7 +18,6 @@ public class NPC : MonoBehaviour
         motionData.maxSpeed = maxSpeed;
         motionData.maxAngularSpeed = maxAngularSpeed;
         motionData.mass = mass;
-        motionData.momI = 0.004f;
         motionData.slowingRadius = slowingRadius;
     }
     void Update()
