@@ -41,5 +41,17 @@ public class MotionData
         }
     }
     public float surgeForce { get => Vector3.Dot(go.GetComponent<Transform>().forward, targetOffset); }
+<<<<<<< HEAD
     public Vector3 surgeVelocity { get => transform.forward * Mathf.Min(rampedSpeed, Mathf.Abs((surgeForce / mass * Time.deltaTime)), maxSpeed); }
+=======
+    public float yawMoment { get => Vector3.Dot(go.GetComponent<Transform>().right, targetOffset); }
+    //public Vector3 surgeVelocity { get => transform.forward * Mathf.Min(rampedSpeed, (surgeForce / mass * Time.deltaTime), maxSpeed); }
+    public Vector3 surgeVelocity 
+    { get 
+        {
+            Debug.Log($"aaa===={Mathf.Min(rampedSpeed, Mathf.Abs((surgeForce / mass * Time.deltaTime)), maxSpeed)},pos={transform.position}");
+            return transform.forward * Mathf.Min(rampedSpeed, Mathf.Abs((surgeForce / mass * Time.deltaTime)), maxSpeed);
+        }  
+    }
+>>>>>>> e58d680335492752e906e929aca7d26b318ae80e
 }
