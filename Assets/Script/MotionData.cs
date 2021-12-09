@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MotionData
 {
-    public Stack<Vector3> path;
+    public Stack<Vector3> path=new Stack<Vector3>();
     public GameObject go;
     public Transform transform { get => go.GetComponent<Transform>(); }
     public float maxSpeed;

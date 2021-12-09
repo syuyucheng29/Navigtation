@@ -19,15 +19,17 @@ public class Navigation
     PathNode sNode = null;
     PathNode eNode = null;
     public bool isSmoothing = false;
+    string txtPath = "Assets/WP.txt";
 
     public Navigation()
     {
         m_Instance = this;
-        ReadWP("Assets/WP.txt");
+        ReadWP();
     }
 
-    public void ReadWP(string txtPath)
+    public void ReadWP()
     {
+        nodeList.Clear();
         StreamReader sr = new StreamReader(txtPath);
         Debug.Log(sr.ReadLine());
         string sline = "";
@@ -49,6 +51,8 @@ public class Navigation
             for (int i = 1; i < myInts.Length; i++)
                 nodeList[myInts[0]].neibors.Add(nodeList[myInts[i]]);
         }
+        if (nodeList.Count() == 0)
+            Debug.LogError("Way points exported failed, Regenerate again!");
     }
     public Stack<Vector3> Reach(Vector3 end)
     {
@@ -88,6 +92,7 @@ public class Navigation
     {
         Debug.Log("Astar Solving");
         (sNode, eNode) = GetCloestToES(start, end);
+        Debug.Log($"add-{sNode.name}");
         openList.Add(sNode);
         //search open nodes
         while (openList.Count > 0)

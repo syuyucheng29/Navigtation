@@ -35,18 +35,16 @@ public class WPGenerator : MonoBehaviour
 
     void Update()
     {
-
         if (Input.GetKeyDown(KeyCode.Space)) //generate wp 
         {
             GenerateWP();
-            CreateLink();
         }
         else if (Input.GetKeyDown(KeyCode.R))
         {
             OutputWP();
         }
     }
-    void GenerateWP()
+    public void GenerateWP()
     {
         Debug.Log("Generation");
         linkLimit += 2;
@@ -80,6 +78,7 @@ public class WPGenerator : MonoBehaviour
                 i++;
             }
         }
+        CreateLink();
     }
     void CreateLink()
     {
@@ -101,12 +100,10 @@ public class WPGenerator : MonoBehaviour
                 RaycastHit rh;
                 if (Physics.Raycast(r, out rh, distance, 1 << LayerMask.NameToLayer("Wall")))
                 {
-                    Debug.Log($"{nodeList[i].name} collide");
                     continue;
                 }
                 else
                 {
-
                     //linked
                     nodeList[i].GetComponent<WP>().neibors.Add(nodeList[j]);
                     count++;
@@ -115,7 +112,7 @@ public class WPGenerator : MonoBehaviour
             }
         }
     }
-    void OutputWP()
+    public void OutputWP()
     {
         Debug.Log("Output WP");
         StreamWriter sw = new StreamWriter("Assets/WP.txt", false);
@@ -138,5 +135,9 @@ public class WPGenerator : MonoBehaviour
             sw.WriteLine(s);
         }
         sw.Close();
+
+        for (int i = 0; i < nodeList.Count; i++)
+            Destroy(nodeList[i]);
+        nodeList.Clear();
     }
 }
