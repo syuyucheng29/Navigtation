@@ -17,6 +17,7 @@ public class Navigation
     PathNode sNode = null;
     PathNode eNode = null;
     public bool isSmoothing = false;
+    public List<Vector3> record = new List<Vector3>();
 
     public Navigation()
     {
@@ -34,14 +35,9 @@ public class Navigation
         while (!sline.Contains("relation"))
         {
             string[] tokens = sline.Split(':');
-            //Debug.Log(tokens[0]);
-            //Debug.Log(tokens[1]);
             PathNode newNode = new PathNode(tokens[0], stringToVector3(tokens[1]));
             nodeList.Add(newNode);
             sline = sr.ReadLine();
-            //for debug
-            //Debug.Log($"{tokens[0]}={newNode.Pos}");
-            //GameObject gn = Instantiate(WP, newNode.Pos, Quaternion.identity);
         }
         //Read WP relation
         while (sr.Peek() != -1)
@@ -61,6 +57,7 @@ public class Navigation
     }
     public Stack<Vector3> SearchPath(Vector3 start, Vector3 end)
     {
+        InitNode();
         if (CheckVisuality(start, end))
         {
             Debug.Log("On visual");
@@ -71,17 +68,13 @@ public class Navigation
             Debug.Log("Astar activated");
             Astar(start, end);
             BuildPath(start, end);
+            if (isSmoothing)
+            {
+                SmoothingPath();
+                return smoothPath;
+            }
         }
-
-        if (isSmoothing)
-        {
-            SmoothingPath();
-            return smoothPath;
-        }
-        else
-        {
-            return path;
-        }
+        return path;
     }
     public bool CheckVisuality(Vector3 start, Vector3 end)
     {
@@ -93,7 +86,6 @@ public class Navigation
     public void Astar(Vector3 start, Vector3 end)
     {
         Debug.Log("Astar Solving");
-        InitNode();
         (sNode, eNode) = GetCloestToES(start, end);
         openList.Add(sNode);
         //search open nodes
@@ -102,6 +94,11 @@ public class Navigation
             PathNode cNode = GetSmallestGNode();
 
             if (cNode.fH < 0.05f)
+            {
+                eNode = cNode;
+                break;
+            }
+            else if (CheckVisuality(cNode.Pos, end))
             {
                 eNode = cNode;
                 break;
@@ -145,6 +142,8 @@ public class Navigation
     }
     void InitNode()
     {
+        eNode = null;
+        sNode = null;
         for (int i = 0; i < nodeList.Count(); i++)
             nodeList[i].Init();
         openList.Clear();
@@ -152,7 +151,9 @@ public class Navigation
     public void BuildPath(Vector3 start, Vector3 end)
     {
         Debug.Log("Build Path");
+        path.Clear();
         path.Push(end);
+        Debug.Log($"end={end}");
         if (eNode == null)
         {
             path.Push(start);
@@ -165,8 +166,10 @@ public class Navigation
             {
                 cNode = cNode.parent;
                 path.Push(cNode.Pos);
+                Debug.Log($"cc={cNode.Pos}");
             }
             path.Push(start);
+            Debug.Log($"start={start}");
         }
     }
     (PathNode sNode, PathNode eNode) GetCloestToES(Vector3 start, Vector3 end)
@@ -216,38 +219,46 @@ public class Navigation
     }
     void SmoothingPath()
     {
+        List<Vector3> totalPath = new List<Vector3>();
         int num = 4 * 2;
         Vector3[] point = new Vector3[4];
         Vector3[] newPath;
-        List<Vector3> totalPath = new List<Vector3>();
-
         while (path.Count() >= 4)
         {
-            for (int i = 0; i < 4; i++)
-                point[i] = path.Pop();
+            point[0] = path.Pop();
+            totalPath.Add(point[0]);
+            point[1] = path.Pop();
+            point[2] = path.Pop();
+            point[3] = path.Pop();
             newPath = crspline.GetCRSpline(num, point, 0.5f);
             for (int i = 0; i < newPath.Length; i++)
                 totalPath.Add(newPath[i]);
+            totalPath.Add(point[3]);
         }
         if (path.Count() == 3)
         {
             point[0] = path.Pop();
+            totalPath.Add(point[0]);
             point[1] = path.Pop();
             point[3] = path.Pop();
             point[2] = Vector3.Lerp(point[1], point[3], 0.5f);
             newPath = crspline.GetCRSpline(num, point, 0.5f);
             for (int i = 0; i < newPath.Length; i++)
-            {
                 totalPath.Add(newPath[i]);
-            }
+            totalPath.Add(point[3]);
         }
-        if (path.Count() == 2)
+        else
         {
-            totalPath.Add(path.Pop());
-            totalPath.Add(path.Pop());
+            int numPath = path.Count();
+            for (int i = 0; i < numPath; i++)
+                totalPath.Add(path.Pop());
         }
+
         for (int i = totalPath.Count() - 1; i >= 0; i--)
+        {
             smoothPath.Push(totalPath[i]);
+            record.Add(totalPath[i]);
+        }
         totalPath.Clear();
     }
 }

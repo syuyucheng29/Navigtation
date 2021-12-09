@@ -7,7 +7,7 @@ public class Motion : MonoBehaviour
 {
     static public void Seek(MotionData md)
     {
-        float tolerence = 0.1f+md.transform.position[1];
+        float tolerence = 0.2f+md.transform.position[1];
 
         try
         {

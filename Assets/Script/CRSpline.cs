@@ -66,9 +66,9 @@ public class CRSpline
     }
     void CalSeq(int num, float[] t)
     {
-        float d = (float)1 / num;
+        float d = (float)1 / (num - 1);
         for (int i = 0; i < num; i++)
-            t[i] = (float)d * i * knot[3];
+            t[i] = knot[1] + (knot[2] - knot[1]) * (float)d * i;
     }
     void CalA(float t)
     {

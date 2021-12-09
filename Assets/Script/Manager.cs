@@ -12,10 +12,13 @@ public class Manager : MonoBehaviour
     Vector3 currentTarget;
     Vector3 currentPosition;
     float distanceToGoal;
+    float initH = 0;
     Ray r;
     private void Awake()
     {
         npc = controlled.GetComponent<NPC>();
+        GetInitHeight();
+        //show pathNode
         for (int i = 0; i < navigation.nodeList.Count; i++)
         {
             GameObject gn = Instantiate(point, navigation.nodeList[i].Pos, Quaternion.identity);
@@ -37,21 +40,32 @@ public class Manager : MonoBehaviour
             if (Physics.Raycast(r, out RaycastHit rh, 1000.0f, 1 << LayerMask.NameToLayer("Terrain")))
             {
                 currentTarget = rh.point;
+                currentTarget[1] += initH;
                 if (distanceToGoal > 0f) 
                     npc.motionData.path.Clear();
                 distanceToGoal = (currentPosition - currentTarget).magnitude;
                 npc.motionData.path = navigation.SearchPath(currentPosition, currentTarget);
             }
         }
-        
-        if (distanceToGoal > npc.motionData.tolerence) 
+    }
+    void OnDrawGizmos()
+    {
+        if (navigation.record.Count > 0)
         {
-            r = new Ray(currentPosition, currentTarget- currentPosition);
-            distanceToGoal = (currentPosition - currentTarget).magnitude;
-            if (!Physics.Raycast(r, out RaycastHit rh, 1000.0f, 1 << LayerMask.NameToLayer("Wall")))
+            for(int i=0; i< navigation.record.Count; i++)
             {
-                npc.motionData.path = navigation.Reach(currentTarget);
+                Gizmos.color = Color.black; 
+                Gizmos.DrawWireSphere(navigation.record[i], 0.5f);
             }
         }
+    }
+    /// <summary>
+    /// To detect interval between model and ground
+    /// </summary>
+    void GetInitHeight()
+    {
+        Vector3 currentPosition = controlled.GetComponent<Transform>().position;
+        Physics.Raycast(new Ray(currentPosition, -Vector3.up), out RaycastHit rh, 1000.0f, 1 << LayerMask.NameToLayer("Terrain"));
+        initH = currentPosition[1] - rh.point[1];
     }
 }
