@@ -11,13 +11,14 @@ public class Navigation
     public GameObject Controlled;
     public List<PathNode> nodeList = new List<PathNode>();
     public List<PathNode> openList = new List<PathNode>();
+    public List<Vector3> record = new List<Vector3>();
+    public int intermediatePoints;
     CRSpline crspline = new CRSpline();
     Stack<Vector3> path = new Stack<Vector3>();
     Stack<Vector3> smoothPath = new Stack<Vector3>();
     PathNode sNode = null;
     PathNode eNode = null;
     public bool isSmoothing = false;
-    public List<Vector3> record = new List<Vector3>();
 
     public Navigation()
     {
@@ -150,10 +151,8 @@ public class Navigation
     }
     public void BuildPath(Vector3 start, Vector3 end)
     {
-        Debug.Log("Build Path");
         path.Clear();
         path.Push(end);
-        Debug.Log($"end={end}");
         if (eNode == null)
         {
             path.Push(start);
@@ -166,10 +165,8 @@ public class Navigation
             {
                 cNode = cNode.parent;
                 path.Push(cNode.Pos);
-                Debug.Log($"cc={cNode.Pos}");
             }
             path.Push(start);
-            Debug.Log($"start={start}");
         }
     }
     (PathNode sNode, PathNode eNode) GetCloestToES(Vector3 start, Vector3 end)
@@ -220,39 +217,29 @@ public class Navigation
     void SmoothingPath()
     {
         List<Vector3> totalPath = new List<Vector3>();
-        int num = 4 * 2;
+        int num = intermediatePoints;
         Vector3[] point = new Vector3[4];
         Vector3[] newPath;
-        while (path.Count() >= 4)
+        Vector3[] oldPath= new Vector3[path.Count()];
+
+        for (int i = 0; i < oldPath.Length; i++)
+            oldPath[i] = path.Pop();
+
+        totalPath.Add(oldPath[0]);
+
+        int j = 0;
+        for(int i=0; i< (oldPath.Length - 4 + 1); i++)
         {
-            point[0] = path.Pop();
-            totalPath.Add(point[0]);
-            point[1] = path.Pop();
-            point[2] = path.Pop();
-            point[3] = path.Pop();
+            for(int k=0; k<4; k++)
+            {
+                point[k] = oldPath[k + j];
+            }
+            j++;
             newPath = crspline.GetCRSpline(num, point, 0.5f);
-            for (int i = 0; i < newPath.Length; i++)
-                totalPath.Add(newPath[i]);
-            totalPath.Add(point[3]);
+            for (int h = 0; h < newPath.Length; h++)
+                totalPath.Add(newPath[h]);
         }
-        if (path.Count() == 3)
-        {
-            point[0] = path.Pop();
-            totalPath.Add(point[0]);
-            point[1] = path.Pop();
-            point[3] = path.Pop();
-            point[2] = Vector3.Lerp(point[1], point[3], 0.5f);
-            newPath = crspline.GetCRSpline(num, point, 0.5f);
-            for (int i = 0; i < newPath.Length; i++)
-                totalPath.Add(newPath[i]);
-            totalPath.Add(point[3]);
-        }
-        else
-        {
-            int numPath = path.Count();
-            for (int i = 0; i < numPath; i++)
-                totalPath.Add(path.Pop());
-        }
+        totalPath.Add(oldPath[oldPath.Length-1]);
 
         for (int i = totalPath.Count() - 1; i >= 0; i--)
         {

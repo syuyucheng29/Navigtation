@@ -540,6 +540,7 @@ MonoBehaviour:
   controlled: {fileID: 986181130}
   point: {fileID: 1869897863}
   isSmoothing: 1
+  intermediatePoints: 5
 --- !u!4 &1683021450
 Transform:
   m_ObjectHideFlags: 0

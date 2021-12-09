@@ -8,6 +8,7 @@ public class Manager : MonoBehaviour
     public GameObject controlled;
     public GameObject point;
     public bool isSmoothing;
+    public int intermediatePoints;
     NPC npc;
     Vector3 currentTarget;
     Vector3 currentPosition;
@@ -18,6 +19,7 @@ public class Manager : MonoBehaviour
     {
         npc = controlled.GetComponent<NPC>();
         GetInitHeight();
+        navigation.intermediatePoints = intermediatePoints;
         //show pathNode
         for (int i = 0; i < navigation.nodeList.Count; i++)
         {
