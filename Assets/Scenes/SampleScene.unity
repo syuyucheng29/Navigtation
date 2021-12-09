@@ -232,8 +232,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.0383912, y: 1, z: 1.1907127}
+  m_Center: {x: -0.00000013750662, y: 0, z: -0.0027788877}
 --- !u!23 &591327057
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -949,7 +949,7 @@ Transform:
   m_GameObject: {fileID: 986181130}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.73, y: 1, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.525, y: 1, z: 0.49979}
   m_Children:
   - {fileID: 1678707514}
   m_Father: {fileID: 0}
@@ -1025,7 +1025,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Clear Gizmos
+  m_Text: Remove Black Circles
 --- !u!222 &1018249652
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1406,8 +1406,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1678707513}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: -0.01, z: 0.444375}
-  m_LocalScale: {x: 0.29999998, y: 0.52031, z: 0.45689}
+  m_LocalPosition: {x: 0, y: -0.01, z: 0.37}
+  m_LocalScale: {x: 0.29999998, y: 0.57925135, z: 0.45689}
   m_Children: []
   m_Father: {fileID: 986181135}
   m_RootOrder: 0
@@ -1854,8 +1854,12 @@ PrefabInstance:
       value: 4.762467
       objectReference: {fileID: 0}
     - target: {fileID: 7128895549130653526, guid: 06f49d52e239d2a44a77ca0a6b76a135, type: 3}
+      propertyPath: m_Radius
+      value: 0.51734084
+      objectReference: {fileID: 0}
+    - target: {fileID: 7128895549130653526, guid: 06f49d52e239d2a44a77ca0a6b76a135, type: 3}
       propertyPath: m_Center.x
-      value: 0.00000003973643
+      value: 0.010956764
       objectReference: {fileID: 0}
     - target: {fileID: 7128895549130653526, guid: 06f49d52e239d2a44a77ca0a6b76a135, type: 3}
       propertyPath: m_Center.y
@@ -1863,7 +1867,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7128895549130653526, guid: 06f49d52e239d2a44a77ca0a6b76a135, type: 3}
       propertyPath: m_Center.z
-      value: -0.00000007947286
+      value: 0.01749897
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 06f49d52e239d2a44a77ca0a6b76a135, type: 3}

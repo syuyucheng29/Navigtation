@@ -13,8 +13,7 @@ public class MotionData
     public float mass;
     public float momI;
     public float slowingRadius;
-    public float tolerence { get => 0.1f + transform.position[1]; }
-
+    public float tolerence { get => 0.05f + transform.position[1]; }
     private Vector3 _target;
     public Vector3 target
     {

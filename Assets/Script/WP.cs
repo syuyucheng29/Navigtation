@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WP : MonoBehaviour
 {
-    public List<GameObject> neibors;
+    public List<GameObject> neibors=new List<GameObject>();
 
     private void OnDrawGizmos()
     {

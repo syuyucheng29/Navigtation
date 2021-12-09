@@ -21,12 +21,10 @@ public class WPGenerator : MonoBehaviour
     void Awake()
     {
         wallList = GameObject.FindGameObjectsWithTag("Wall");
-        Debug.Log(wallList.Length);
         zoneSize = Zone.GetComponent<Collider>().bounds.size;
         zoneCenter = Zone.GetComponent<Transform>().position;
         zoneField = zoneSize / 2 - zoneCenter;
         linkRadius = 0.5f * Mathf.Sqrt(2 * (zoneSize[0] + zoneSize[1] + zoneSize[2]));
-        Debug.Log($"Size={zoneSize} Radius={linkRadius}");
     }
 
     void Start()
@@ -82,8 +80,9 @@ public class WPGenerator : MonoBehaviour
     }
     void CreateLink()
     {
-        Debug.Log($"linkLimit={linkLimit}");
-        nodeList.OrderBy(m => m.transform.position[0]);
+        for (int i = 0; i < nodeList.Count; i++)
+            nodeList[i].GetComponent<WP>().neibors.Clear();
+
         Vector3 between;
         float distance;
         for (int i = 0; i < nodeList.Count; i++)
@@ -92,10 +91,11 @@ public class WPGenerator : MonoBehaviour
             for (int j = 0; j < nodeList.Count; j++)
             {
                 if (i == j) continue;
-                //On visual?
                 between = nodeList[j].transform.position - nodeList[i].transform.position;
                 distance = between.magnitude;
-                if (distance > linkRadius) continue;
+                if (distance > linkRadius) 
+                    continue;
+                //On visual?
                 Ray r = new Ray(nodeList[i].transform.position, between);
                 RaycastHit rh;
                 if (Physics.Raycast(r, out rh, distance, 1 << LayerMask.NameToLayer("Wall")))
@@ -107,7 +107,8 @@ public class WPGenerator : MonoBehaviour
                     //linked
                     nodeList[i].GetComponent<WP>().neibors.Add(nodeList[j]);
                     count++;
-                    if (count > linkLimit) break;
+                    if (count > linkLimit) 
+                        break;
                 }
             }
         }

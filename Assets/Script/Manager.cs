@@ -61,13 +61,12 @@ public class Manager : MonoBehaviour
                 for (int i = 0; i < navigation.record.Count; i++)
                 {
                     Gizmos.color = Color.black;
-                    Gizmos.DrawWireSphere(navigation.record[i], 0.5f);
+                    Gizmos.DrawWireSphere(navigation.record[i], 0.2f);
                 }
             }
         }
         catch (Exception e)
         {
-
         }
     }
     /// <summary>

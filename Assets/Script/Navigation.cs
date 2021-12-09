@@ -92,7 +92,6 @@ public class Navigation
     {
         Debug.Log("Astar Solving");
         (sNode, eNode) = GetCloestToES(start, end);
-        Debug.Log($"add-{sNode.name}");
         openList.Add(sNode);
         //search open nodes
         while (openList.Count > 0)
@@ -196,7 +195,7 @@ public class Navigation
         }
         return (nodeList[iS], nodeList[iE]);
     }
-    PathNode GetSmallestGNode() => openList.Where(a => a.fG == openList.Min(x => x.fG)).SingleOrDefault();
+    PathNode GetSmallestGNode() => openList.Where(a => a.fG == openList.Min(x => x.fG)).Take(1).SingleOrDefault();
     Vector3 stringToVector3(string sVector)
     {
         // Remove the parentheses
