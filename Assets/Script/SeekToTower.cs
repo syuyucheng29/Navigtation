@@ -2,43 +2,30 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class Manager : MonoBehaviour
+public class SeekToTower : MonoBehaviour
 {
     Navigation navigation = new Navigation();
     public GameObject controlled;
     public GameObject point;
-    public bool isSmoothing;
-    public int intermediatePoints;
-    public Toggle toggle;
     List<GameObject> store = new List<GameObject>();
     NPC npc;
     Vector3 currentTarget;
     Vector3 currentPosition;
     float distanceToGoal;
+    float initH = 0;
     Ray r;
     private void Awake()
     {
         npc = controlled.GetComponent<NPC>();
-        navigation.intermediatePoints = intermediatePoints;
-        //show pathNode
-        for (int i = 0; i < navigation.nodeList.Count; i++)
-        {
-            GameObject gn = Instantiate(point, navigation.nodeList[i].Pos, Quaternion.identity);
-            store.Add(gn);
-            gn.name = i + "";
-        }
+        GetInitHeight();
+        navigation.intermediatePoints = 5;
     }
     void Start()
     {
-        toggle.onValueChanged.AddListener(delegate {
-            ToggleSmooth();
-        });
     }
     void Update()
     {
-        navigation.isSmoothing = isSmoothing;
         currentPosition = controlled.GetComponent<Transform>().position;
 
         if (Input.GetMouseButtonDown(0))
@@ -47,8 +34,8 @@ public class Manager : MonoBehaviour
             if (Physics.Raycast(r, out RaycastHit rh, 1000.0f, 1 << LayerMask.NameToLayer("Terrain")))
             {
                 currentTarget = rh.point;
-                currentTarget[1] += npc.motionData.initH;
-                if (distanceToGoal > 0f) 
+                currentTarget[1] += initH;
+                if (distanceToGoal > 0f)
                     npc.motionData.path.Clear();
                 distanceToGoal = (currentPosition - currentTarget).magnitude;
                 npc.motionData.path = navigation.SearchPath(currentPosition, currentTarget);
@@ -72,10 +59,7 @@ public class Manager : MonoBehaviour
         {
         }
     }
-    /// <summary>
-    /// To detect interval between model and ground
-    /// </summary>
-    
+
     public void ReadWP()
     {
         for (int i = 0; i < store.Count; i++)
@@ -95,5 +79,11 @@ public class Manager : MonoBehaviour
     {
         navigation.record.Clear();
     }
-    void ToggleSmooth()=>isSmoothing = toggle.isOn;
+    void GetInitHeight()
+    {
+        Vector3 currentPosition = controlled.GetComponent<Transform>().position;
+        Physics.Raycast(new Ray(currentPosition, -Vector3.up), out RaycastHit rh, 1000.0f, 1 << LayerMask.NameToLayer("Terrain"));
+        initH = currentPosition[1] - rh.point[1];
+        npc.motionData.initH = initH;
+    }
 }

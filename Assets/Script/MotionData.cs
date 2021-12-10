@@ -45,4 +45,11 @@ public class MotionData
     public float surgeForce { get => Vector3.Dot(go.GetComponent<Transform>().forward, targetOffset); }
     public float yawMoment { get => Vector3.Dot(go.GetComponent<Transform>().right, targetOffset); }
     public Vector3 surgeVelocity { get => transform.forward * Mathf.Min(rampedSpeed, Mathf.Abs(surgeForce / mass * Time.deltaTime), maxSpeed); }
+
+    public void GetInitHeight()
+    {
+        Vector3 currentPosition = go.GetComponent<Transform>().position;
+        Physics.Raycast(new Ray(currentPosition, -Vector3.up), out RaycastHit rh, 1000.0f, 1 << LayerMask.NameToLayer("Terrain"));
+        initH = currentPosition[1] - rh.point[1];
+    }
 }

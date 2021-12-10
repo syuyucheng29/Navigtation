@@ -7,8 +7,6 @@ using UnityEngine;
 public class Navigation
 {
     public static Navigation m_Instance;
-    public GameObject WP;
-    public GameObject Controlled;
     public List<PathNode> nodeList = new List<PathNode>();
     public List<PathNode> openList = new List<PathNode>();
     public List<Vector3> record = new List<Vector3>();

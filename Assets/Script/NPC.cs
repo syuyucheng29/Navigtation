@@ -20,6 +20,7 @@ public class NPC : MonoBehaviour
         motionData.mass = mass;
         motionData.momI = 0.004f;
         motionData.slowingRadius = slowingRadius;
+        motionData.GetInitHeight();
     }
     void Update()
     {
