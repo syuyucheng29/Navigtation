@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Manager : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class Manager : MonoBehaviour
     public GameObject point;
     public bool isSmoothing;
     public int intermediatePoints;
+    public Toggle toggle;
     List<GameObject> store = new List<GameObject>();
     NPC npc;
     Vector3 currentTarget;
@@ -32,6 +34,9 @@ public class Manager : MonoBehaviour
     }
     void Start()
     {
+        toggle.onValueChanged.AddListener(delegate {
+            ToggleSmooth();
+        });
     }
     void Update()
     {
@@ -72,12 +77,7 @@ public class Manager : MonoBehaviour
     /// <summary>
     /// To detect interval between model and ground
     /// </summary>
-    void GetInitHeight()
-    {
-        Vector3 currentPosition = controlled.GetComponent<Transform>().position;
-        Physics.Raycast(new Ray(currentPosition, -Vector3.up), out RaycastHit rh, 1000.0f, 1 << LayerMask.NameToLayer("Terrain"));
-        initH = currentPosition[1] - rh.point[1];
-    }
+    
     public void ReadWP()
     {
         for (int i = 0; i < store.Count; i++)
@@ -97,4 +97,12 @@ public class Manager : MonoBehaviour
     {
         navigation.record.Clear();
     }
+    void GetInitHeight()
+    {
+        Vector3 currentPosition = controlled.GetComponent<Transform>().position;
+        Physics.Raycast(new Ray(currentPosition, -Vector3.up), out RaycastHit rh, 1000.0f, 1 << LayerMask.NameToLayer("Terrain"));
+        initH = currentPosition[1] - rh.point[1];
+        npc.motionData.initH = initH;
+    }
+    void ToggleSmooth()=>isSmoothing = toggle.isOn;
 }

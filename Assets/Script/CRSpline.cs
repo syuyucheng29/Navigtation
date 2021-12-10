@@ -28,7 +28,6 @@ public class CRSpline
         for (int i = 0; i < 4; i++)
             knot[i] = 0f;
     }
-
     public Vector3[] GetCRSpline(int num, Vector3[] npoint, float alpha)
     {
         Vector3[] result = new Vector3[num];
@@ -51,7 +50,6 @@ public class CRSpline
         }
         return result;
     }
-
     void CalKnot()
     {
         for (int i = 1; i < 4; i++)

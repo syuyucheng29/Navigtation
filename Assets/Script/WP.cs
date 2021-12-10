@@ -5,7 +5,7 @@ using UnityEngine;
 public class WP : MonoBehaviour
 {
     public List<GameObject> neibors=new List<GameObject>();
-
+    public float distance;
     private void OnDrawGizmos()
     {
         if (neibors != null && neibors.Count > 0)

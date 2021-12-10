@@ -54,12 +54,6 @@ public class Navigation
         if (nodeList.Count() == 0)
             Debug.LogError("Way points exported failed, Regenerate again!");
     }
-    public Stack<Vector3> Reach(Vector3 end)
-    {
-        Stack<Vector3> result = new Stack<Vector3>();
-        result.Push(end);
-        return result;
-    }
     public Stack<Vector3> SearchPath(Vector3 start, Vector3 end)
     {
         InitNode();
@@ -164,7 +158,11 @@ public class Navigation
         else
         {
             PathNode cNode = eNode;
-            path.Push(cNode.Pos);
+
+            Vector3 nextPos = cNode.Pos;
+            Vector3 extraPos = Vector3.LerpUnclamped(end, nextPos, 0.5f);
+            path.Push(extraPos);
+            path.Push(nextPos);
             while (cNode.parent != null)
             {
                 cNode = cNode.parent;
