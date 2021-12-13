@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,42 +5,78 @@ using UnityEngine;
 public class SeekToTower : MonoBehaviour
 {
     Navigation navigation = new Navigation();
-    public GameObject controlled;
-    public GameObject point;
-    List<GameObject> store = new List<GameObject>();
-    NPC npc;
-    Vector3 currentTarget;
-    Vector3 currentPosition;
-    float distanceToGoal;
-    float initH = 0;
-    Ray r;
-    private void Awake()
-    {
-        npc = controlled.GetComponent<NPC>();
-        GetInitHeight();
-        navigation.intermediatePoints = 5;
-    }
+    List<GameObject> live = new List<GameObject>();
+    public int numNPC;
+    public GameObject tower;
+    Vector3 towerPos;
+
     void Start()
     {
+        towerPos = tower.GetComponent<Transform>().position;
+        for (int i = 0; i < numNPC; i++)
+            StartCoroutine(LoadGO("Npc2", SetGO));
     }
-    void Update()
-    {
-        currentPosition = controlled.GetComponent<Transform>().position;
 
-        if (Input.GetMouseButtonDown(0))
+    private void Update()
+    {
+        for (int i = 0; i < numNPC; i++)
         {
-            r = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(r, out RaycastHit rh, 1000.0f, 1 << LayerMask.NameToLayer("Terrain")))
+            if (live[i].active)
             {
-                currentTarget = rh.point;
-                currentTarget[1] += initH;
-                if (distanceToGoal > 0f)
-                    npc.motionData.path.Clear();
-                distanceToGoal = (currentPosition - currentTarget).magnitude;
-                npc.motionData.path = navigation.SearchPath(currentPosition, currentTarget);
+                Reach(live[i]);
+            }
+            else
+            {
+                StartCoroutine(Reset(live[i]));
             }
         }
     }
+    IEnumerator LoadGO(string sPath, System.Action<GameObject> Act)
+    {
+        Debug.Log("LoadGameObjectAsync -1" + Time.deltaTime);
+        GameObject go = null;
+        //ResourceRequest rr = Resources.LoadAsync(sPath);
+        //if (rr == null)
+        //{
+        //    yield break;
+        //}
+        //if (rr.isDone && rr.asset != null)
+        //{
+        //    go = Instantiate(rr.asset) as GameObject;
+        //    Act(go);
+        //}
+        Object o = Resources.Load(sPath);
+        go = Instantiate(o) as GameObject;
+        Act(go);
+        yield return 0;
+    }
+    void SetGO(GameObject go)
+    {
+        SetPos(go);
+        SearchPath(go);
+        live.Add(go);
+    }
+    void SetPos(GameObject go) => go.GetComponent<Transform>().position =
+            new Vector3(Random.Range(-1f, 1f),
+                        0,
+                        Random.Range(-1f, 1f));
+    void SearchPath(GameObject go)=>go.GetComponent<NPC>().motionData.path = navigation.SearchPath(go.GetComponent<Transform>().position,towerPos);
+    void Reach(GameObject go)
+    {
+        float distance = (towerPos - go.GetComponent<Transform>().position).magnitude;
+        if (distance < 0.1f)
+        {
+            go.SetActive(false);
+        }
+    }
+    IEnumerator Reset(GameObject go)
+    {
+        yield return new WaitForSeconds(2.0f);
+        SetGO(go);
+        SearchPath(go);
+        go.SetActive(true);
+    }
+
     void OnDrawGizmos()
     {
         try
@@ -55,35 +90,8 @@ public class SeekToTower : MonoBehaviour
                 }
             }
         }
-        catch (Exception e)
+        catch (System.Exception e)
         {
         }
-    }
-
-    public void ReadWP()
-    {
-        for (int i = 0; i < store.Count; i++)
-        {
-            Destroy(store[i]);
-        }
-        store.Clear();
-        navigation.ReadWP();
-        for (int i = 0; i < navigation.nodeList.Count; i++)
-        {
-            GameObject gn = Instantiate(point, navigation.nodeList[i].Pos, Quaternion.identity);
-            store.Add(gn);
-            gn.name = i + "";
-        }
-    }
-    public void ResetGizmos()
-    {
-        navigation.record.Clear();
-    }
-    void GetInitHeight()
-    {
-        Vector3 currentPosition = controlled.GetComponent<Transform>().position;
-        Physics.Raycast(new Ray(currentPosition, -Vector3.up), out RaycastHit rh, 1000.0f, 1 << LayerMask.NameToLayer("Terrain"));
-        initH = currentPosition[1] - rh.point[1];
-        npc.motionData.initH = initH;
     }
 }

@@ -59,6 +59,7 @@ public class Navigation
         {
             Debug.Log("On visual");
             BuildPath(start, end);
+            Debug.Log($"end{end}");
         }
         else
         {
