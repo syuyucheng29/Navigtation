@@ -8,16 +8,10 @@ public class Navigation
 {
     public static Navigation m_Instance;
     public List<PathNode> nodeList = new List<PathNode>();
-    public List<PathNode> openList = new List<PathNode>();
-    public List<Vector3> record = new List<Vector3>();
-    public int intermediatePoints;
-    CRSpline crspline = new CRSpline();
-    Stack<Vector3> path = new Stack<Vector3>();
-    Stack<Vector3> smoothPath = new Stack<Vector3>();
-    PathNode sNode = null;
-    PathNode eNode = null;
     public bool isSmoothing = false;
+    public int intermediatePoints;
     string txtPath = "Assets/WP.txt";
+    CRSpline crspline = new CRSpline();
 
     public Navigation()
     {
@@ -52,27 +46,30 @@ public class Navigation
         if (nodeList.Count() == 0)
             Debug.LogError("Way points exported failed, Regenerate again!");
     }
-    public Stack<Vector3> SearchPath(Vector3 start, Vector3 end)
+    public void SearchPath(Vector3 end, MotionData md)
     {
-        InitNode();
+        Vector3 start = md.transform.position;
+        Debug.Log($"{end}");
+        InitNode(md);
         if (CheckVisuality(start, end))
         {
             Debug.Log("On visual");
-            BuildPath(start, end);
-            Debug.Log($"end{end}");
+            BuildPath(start, end, md);
         }
         else
         {
             Debug.Log("Astar activated");
-            Astar(start, end);
-            BuildPath(start, end);
+            Astar(start, end, md);
+            BuildPath(start, end, md);
             if (isSmoothing)
-            {
-                SmoothingPath();
-                return smoothPath;
+            {   
+                SmoothingPath(md);
+                md.path = md.smoothPath;
+                return;
             }
+                
         }
-        return path;
+        md.path = md.samplePath;
     }
     public bool CheckVisuality(Vector3 start, Vector3 end)
     {
@@ -81,24 +78,24 @@ public class Navigation
             return true;
         return false;
     }
-    public void Astar(Vector3 start, Vector3 end)
+    public void Astar(Vector3 start, Vector3 end, MotionData md)
     {
         Debug.Log("Astar Solving");
-        (sNode, eNode) = GetCloestToES(start, end);
-        openList.Add(sNode);
+        (md.sNode, md.eNode) = GetCloestToES(start, end);
+        md.openList.Add(md.sNode);
         //search open nodes
-        while (openList.Count > 0)
+        while (md.openList.Count > 0)
         {
-            PathNode cNode = GetSmallestGNode();
+            PathNode cNode = GetSmallestGNode(md);
 
             if (cNode.fH < 0.05f)
             {
-                eNode = cNode;
+                md.eNode = cNode;
                 break;
             }
             else if (CheckVisuality(cNode.Pos, end))
             {
-                eNode = cNode;
+                md.eNode = cNode;
                 break;
             }
             else
@@ -126,7 +123,7 @@ public class Navigation
                         else
                         {
                             nNode.eState = ePathNodeState.OPENED;
-                            openList.Add(nNode);
+                            md.openList.Add(nNode);
                             nNode.fG = cton;
                             nNode.CalfT();
                             nNode.parent = cNode;
@@ -135,39 +132,39 @@ public class Navigation
                     cNode.eState = ePathNodeState.CLOSED;
                 }
             }
-            openList.Remove(cNode);
+            md.openList.Remove(cNode);
         }
     }
-    void InitNode()
+    void InitNode(MotionData md)
     {
-        eNode = null;
-        sNode = null;
+        md.eNode = null;
+        md.sNode = null;
         for (int i = 0; i < nodeList.Count(); i++)
             nodeList[i].Init();
-        openList.Clear();
+        md.openList.Clear();
     }
-    public void BuildPath(Vector3 start, Vector3 end)
+    public void BuildPath(Vector3 start, Vector3 end, MotionData md)
     {
-        path.Clear();
-        path.Push(end);
-        if (eNode == null)
+        md.samplePath.Clear();
+        md.samplePath.Push(end);
+        if (md.eNode == null)
         {
-            path.Push(start);
+            md.samplePath.Push(start);
         }
         else
         {
-            PathNode cNode = eNode;
+            PathNode cNode = md.eNode;
 
             Vector3 nextPos = cNode.Pos;
             Vector3 extraPos = Vector3.LerpUnclamped(end, nextPos, 0.5f);
-            path.Push(extraPos);
-            path.Push(nextPos);
+            md.samplePath.Push(extraPos);
+            md.samplePath.Push(nextPos);
             while (cNode.parent != null)
             {
                 cNode = cNode.parent;
-                path.Push(cNode.Pos);
+                md.samplePath.Push(cNode.Pos);
             }
-            path.Push(start);
+            md.samplePath.Push(start);
         }
     }
     (PathNode sNode, PathNode eNode) GetCloestToES(Vector3 start, Vector3 end)
@@ -192,7 +189,7 @@ public class Navigation
         }
         return (nodeList[iS], nodeList[iE]);
     }
-    PathNode GetSmallestGNode() => openList.Where(a => a.fG == openList.Min(x => x.fG)).Take(1).SingleOrDefault();
+    PathNode GetSmallestGNode(MotionData md) => md.openList.Where(a => a.fG == md.openList.Min(x => x.fG)).Take(1).SingleOrDefault();
     Vector3 stringToVector3(string sVector)
     {
         // Remove the parentheses
@@ -215,16 +212,16 @@ public class Navigation
         Vector3 interval = point1 - point2;
         return Vector3.Dot(interval, interval);
     }
-    void SmoothingPath()
+    void SmoothingPath(MotionData md)
     {
         List<Vector3> totalPath = new List<Vector3>();
         int num = intermediatePoints;
         Vector3[] point = new Vector3[4];
         Vector3[] newPath;
-        Vector3[] oldPath= new Vector3[path.Count()];
+        Vector3[] oldPath= new Vector3[md.samplePath.Count()];
 
         for (int i = 0; i < oldPath.Length; i++)
-            oldPath[i] = path.Pop();
+            oldPath[i] = md.samplePath.Pop();
 
         totalPath.Add(oldPath[0]);
 
@@ -244,8 +241,8 @@ public class Navigation
 
         for (int i = totalPath.Count() - 1; i >= 0; i--)
         {
-            smoothPath.Push(totalPath[i]);
-            record.Add(totalPath[i]);
+            md.smoothPath.Push(totalPath[i]);
+            md.record.Add(totalPath[i]);
         }
         totalPath.Clear();
     }

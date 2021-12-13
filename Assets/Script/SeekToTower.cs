@@ -9,46 +9,47 @@ public class SeekToTower : MonoBehaviour
     public int numNPC;
     public GameObject tower;
     Vector3 towerPos;
+    float tol;
 
     void Start()
     {
         towerPos = tower.GetComponent<Transform>().position;
+        tol = towerPos[1]*towerPos[1];
         for (int i = 0; i < numNPC; i++)
+        {
             StartCoroutine(LoadGO("Npc2", SetGO));
+        }
+            
     }
 
     private void Update()
     {
         for (int i = 0; i < numNPC; i++)
         {
-            if (live[i].active)
+            if (live[i].activeSelf)
             {
                 Reach(live[i]);
             }
             else
             {
-                StartCoroutine(Reset(live[i]));
+                StartCoroutine(ResetGO(live[i]));
             }
         }
     }
     IEnumerator LoadGO(string sPath, System.Action<GameObject> Act)
     {
-        Debug.Log("LoadGameObjectAsync -1" + Time.deltaTime);
         GameObject go = null;
-        //ResourceRequest rr = Resources.LoadAsync(sPath);
-        //if (rr == null)
-        //{
-        //    yield break;
-        //}
-        //if (rr.isDone && rr.asset != null)
-        //{
-        //    go = Instantiate(rr.asset) as GameObject;
-        //    Act(go);
-        //}
-        Object o = Resources.Load(sPath);
-        go = Instantiate(o) as GameObject;
-        Act(go);
-        yield return 0;
+        ResourceRequest rr = Resources.LoadAsync(sPath);
+        if (rr == null)
+        {
+            yield break;
+        }
+        yield return rr;
+        if (rr.isDone && rr.asset != null)
+        {
+            go = Instantiate(rr.asset) as GameObject;
+            Act(go);
+        }
     }
     void SetGO(GameObject go)
     {
@@ -56,42 +57,29 @@ public class SeekToTower : MonoBehaviour
         SearchPath(go);
         live.Add(go);
     }
-    void SetPos(GameObject go) => go.GetComponent<Transform>().position =
-            new Vector3(Random.Range(-1f, 1f),
+    void SetPos(GameObject go)
+    {
+        Vector3 pos = new Vector3(Random.Range(-1f, 1f),
                         0,
                         Random.Range(-1f, 1f));
-    void SearchPath(GameObject go)=>go.GetComponent<NPC>().motionData.path = navigation.SearchPath(go.GetComponent<Transform>().position,towerPos);
+        go.GetComponent<Transform>().position = pos;
+        go.GetComponent<NPC>().motionData.target = pos;
+    }
+    void SearchPath(GameObject go)=>navigation.SearchPath(towerPos, go.GetComponent<NPC>().motionData);
     void Reach(GameObject go)
     {
         float distance = (towerPos - go.GetComponent<Transform>().position).magnitude;
-        if (distance < 0.1f)
+        if (distance < tol)
         {
             go.SetActive(false);
         }
     }
-    IEnumerator Reset(GameObject go)
+    IEnumerator ResetGO(GameObject go)
     {
         yield return new WaitForSeconds(2.0f);
-        SetGO(go);
+        SetPos(go);
         SearchPath(go);
         go.SetActive(true);
-    }
-
-    void OnDrawGizmos()
-    {
-        try
-        {
-            if (navigation.record.Count > 0)
-            {
-                for (int i = 0; i < navigation.record.Count; i++)
-                {
-                    Gizmos.color = Color.black;
-                    Gizmos.DrawWireSphere(navigation.record[i], 0.2f);
-                }
-            }
-        }
-        catch (System.Exception e)
-        {
-        }
+        
     }
 }

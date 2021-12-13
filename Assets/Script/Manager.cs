@@ -51,7 +51,7 @@ public class Manager : MonoBehaviour
                 if (distanceToGoal > 0f) 
                     npc.motionData.path.Clear();
                 distanceToGoal = (currentPosition - currentTarget).magnitude;
-                npc.motionData.path = navigation.SearchPath(currentPosition, currentTarget);
+                navigation.SearchPath(currentTarget, npc.motionData);
             }
         }
     }
@@ -59,12 +59,13 @@ public class Manager : MonoBehaviour
     {
         try
         {
-            if (navigation.record.Count > 0)
+            int count = npc.motionData.record.Count;
+            if (count > 0)
             {
-                for (int i = 0; i < navigation.record.Count; i++)
+                for (int i = 0; i < count; i++)
                 {
                     Gizmos.color = Color.black;
-                    Gizmos.DrawWireSphere(navigation.record[i], 0.2f);
+                    Gizmos.DrawWireSphere(npc.motionData.record[i], 0.2f);
                 }
             }
         }
@@ -93,7 +94,7 @@ public class Manager : MonoBehaviour
     }
     public void ResetGizmos()
     {
-        navigation.record.Clear();
+        npc.motionData.record.Clear();
     }
     void ToggleSmooth()=>isSmoothing = toggle.isOn;
 }

@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class MotionData
 {
-    public Stack<Vector3> path=new Stack<Vector3>();
     public GameObject go;
     public Transform transform { get => go.GetComponent<Transform>(); }
     public float maxSpeed;
@@ -45,7 +44,15 @@ public class MotionData
     public float surgeForce { get => Vector3.Dot(go.GetComponent<Transform>().forward, targetOffset); }
     public float yawMoment { get => Vector3.Dot(go.GetComponent<Transform>().right, targetOffset); }
     public Vector3 surgeVelocity { get => transform.forward * Mathf.Min(rampedSpeed, Mathf.Abs(surgeForce / mass * Time.deltaTime), maxSpeed); }
-
+    
+    //Search path
+    public List<PathNode> openList = new List<PathNode>();
+    public List<Vector3> record = new List<Vector3>();
+    public Stack<Vector3> samplePath = new Stack<Vector3>();
+    public Stack<Vector3> smoothPath = new Stack<Vector3>();
+    public Stack<Vector3> path;
+    public PathNode sNode = null;
+    public PathNode eNode = null;
     public void GetInitHeight()
     {
         Vector3 currentPosition = go.GetComponent<Transform>().position;
