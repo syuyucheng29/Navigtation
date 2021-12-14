@@ -207,10 +207,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c146f780176cf7b4f95962c9cc916f59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 5
-  maxAngularSpeed: 500
-  mass: 0.002
+  maxSpeed: 3
+  maxAngularSpeed: 400
+  mass: 0.003
   slowingRadius: 5
+  isRequested: 0
 --- !u!1 &941135834532015109
 GameObject:
   m_ObjectHideFlags: 0

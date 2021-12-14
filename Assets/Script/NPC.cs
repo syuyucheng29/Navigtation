@@ -6,11 +6,14 @@ using UnityEngine;
 public class NPC : MonoBehaviour
 {
     public MotionData motionData = new MotionData();
-
     public float maxSpeed;
     public float maxAngularSpeed;
     public float mass;
     public float slowingRadius;
+
+    [HideInInspector]
+    public bool isRequested = false;
+
     void Awake()
     {
         motionData.go = this.gameObject;

@@ -533,7 +533,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab4e36c83ee898a4383dfb3ff806cb9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numNPC: 3
+  numNPC: 5
   tower: {fileID: 468326331}
 --- !u!1 &2007730051
 GameObject:

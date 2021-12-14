@@ -8,8 +8,8 @@ public class Navigation
 {
     public static Navigation m_Instance;
     public List<PathNode> nodeList = new List<PathNode>();
-    public bool isSmoothing = false;
-    public int intermediatePoints;
+    public bool isSmoothing = true;
+    public int intermediatePoints=3;
     string txtPath = "Assets/WP.txt";
     CRSpline crspline = new CRSpline();
 

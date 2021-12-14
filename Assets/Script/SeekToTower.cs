@@ -14,17 +14,17 @@ public class SeekToTower : MonoBehaviour
     void Start()
     {
         towerPos = tower.GetComponent<Transform>().position;
-        tol = towerPos[1]*towerPos[1];
+        tol = Mathf.Abs(towerPos[1]);
         for (int i = 0; i < numNPC; i++)
         {
             StartCoroutine(LoadGO("Npc2", SetGO));
         }
-            
+        new WaitForSeconds(1f);
     }
 
-    private void Update()
+    void Update()
     {
-        for (int i = 0; i < numNPC; i++)
+        for (int i = 0; i < live.Count; i++)
         {
             if (live[i].activeSelf)
             {
@@ -32,7 +32,11 @@ public class SeekToTower : MonoBehaviour
             }
             else
             {
-                StartCoroutine(ResetGO(live[i]));
+                if (!live[i].GetComponent<NPC>().isRequested)
+                {
+                    StartCoroutine(ResetGO(live[i]));
+                    live[i].GetComponent<NPC>().isRequested = true;
+                }
             }
         }
     }
@@ -59,9 +63,9 @@ public class SeekToTower : MonoBehaviour
     }
     void SetPos(GameObject go)
     {
-        Vector3 pos = new Vector3(Random.Range(-1f, 1f),
+        Vector3 pos = new Vector3(Random.Range(-5f, 5f),
                         0,
-                        Random.Range(-1f, 1f));
+                        Random.Range(-5f, 5f));
         go.GetComponent<Transform>().position = pos;
         go.GetComponent<NPC>().motionData.target = pos;
     }
@@ -69,9 +73,10 @@ public class SeekToTower : MonoBehaviour
     void Reach(GameObject go)
     {
         float distance = (towerPos - go.GetComponent<Transform>().position).magnitude;
-        if (distance < tol)
+        if (distance < tol+go.GetComponent<NPC>().motionData.initH)
         {
             go.SetActive(false);
+            go.GetComponent<NPC>().isRequested = false;
         }
     }
     IEnumerator ResetGO(GameObject go)
@@ -80,6 +85,5 @@ public class SeekToTower : MonoBehaviour
         SetPos(go);
         SearchPath(go);
         go.SetActive(true);
-        
     }
 }
