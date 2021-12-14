@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: 1dbcf309174b09443bbdf49520611071
+  - enabled: 1
+    path: Assets/Scenes/SeekToTower.unity
+    guid: e9a3ddd50632a94468c5f99c3f0c339c
   m_configObjects: {}

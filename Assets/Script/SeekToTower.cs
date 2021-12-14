@@ -6,11 +6,19 @@ public class SeekToTower : MonoBehaviour
 {
     Navigation navigation = new Navigation();
     List<GameObject> live = new List<GameObject>();
+    public GameObject Zone;
+    Vector3 zoneSize, zoneCenter, zoneField;
     public int numNPC;
     public GameObject tower;
     Vector3 towerPos;
     float tol;
 
+    void Awake()
+    {
+        zoneSize = Zone.GetComponent<Collider>().bounds.size;
+        zoneCenter = Zone.GetComponent<Transform>().position;
+        zoneField = zoneSize / 2 - zoneCenter;
+    }
     void Start()
     {
         towerPos = tower.GetComponent<Transform>().position;
@@ -63,9 +71,10 @@ public class SeekToTower : MonoBehaviour
     }
     void SetPos(GameObject go)
     {
-        Vector3 pos = new Vector3(Random.Range(-5f, 5f),
-                        0,
-                        Random.Range(-5f, 5f));
+        Vector3 pos = new Vector3(
+                Random.Range(-zoneField[0], zoneField[0]),
+                0,
+                Random.Range(-zoneField[2], zoneField[2]));
         go.GetComponent<Transform>().position = pos;
         go.GetComponent<NPC>().motionData.target = pos;
     }
@@ -86,4 +95,6 @@ public class SeekToTower : MonoBehaviour
         SearchPath(go);
         go.SetActive(true);
     }
+
+    public void ChangeScene(string sceneName) => ChangeSceneManager.ChangeScene(sceneName);
 }
