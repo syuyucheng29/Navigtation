@@ -7,10 +7,14 @@ public class SeekToTower : MonoBehaviour
     Navigation navigation = new Navigation();
     List<GameObject> live = new List<GameObject>();
     public GameObject Zone;
-    Vector3 zoneSize, zoneCenter, zoneField;
+    
     public int maxNumNPC;
     public GameObject tower;
+    public GameObject miniMap;
     Vector3 towerPos;
+    Vector3 zoneSize, zoneCenter, zoneField;
+    DrawInfo infoToMap = new DrawInfo();
+
     float tol;
     int cNumNPC = 0;
 
@@ -32,6 +36,12 @@ public class SeekToTower : MonoBehaviour
 
     void Update()
     {
+        miniMap.SendMessage("InitTexture");
+        infoToMap.point =towerPos;
+        infoToMap.cubeSize = 7;
+        infoToMap.color = Color.red;
+        miniMap.SendMessage("DrawOnMiniMap", infoToMap);
+
         if (Input.GetMouseButtonDown(0))
         {
             Ray r = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -48,6 +58,10 @@ public class SeekToTower : MonoBehaviour
             if (live[i].activeSelf)
             {
                 Reach(live[i]);
+                infoToMap.point = live[i].transform.position;
+                infoToMap.cubeSize = 3;
+                infoToMap.color = Color.blue;
+                miniMap.SendMessage("DrawOnMiniMap", infoToMap);
             }
             else
             {
@@ -58,6 +72,11 @@ public class SeekToTower : MonoBehaviour
                 }
             }
         }
+    }
+
+     void LateUpdate()
+    {
+        miniMap.SendMessage("DrawDone");
     }
     IEnumerator LoadGO(string sPath, Vector2 inputPoint, System.Action<GameObject, Vector2> Act)
     {
@@ -125,6 +144,5 @@ public class SeekToTower : MonoBehaviour
         SearchPath(go);
         go.SetActive(true);
     }
-
     public void ChangeScene(string sceneName) => ChangeSceneManager.ChangeScene(sceneName);
 }

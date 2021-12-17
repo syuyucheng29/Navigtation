@@ -4,6 +4,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+public class DrawInfo
+{
+    public Vector3 point;
+    public int cubeSize;
+    public Color color;
+}
+
 public class MiniMap : MonoBehaviour
 {
     GameObject miniMap;
@@ -11,7 +18,7 @@ public class MiniMap : MonoBehaviour
     int mapW, mapH;
 
     public GameObject zone;
-    Vector3 zoneSize, zoneCenter;
+    Vector3 zoneSize;
     Vector3 _zoneNewOrigin;
 
     Texture2D _texture;
@@ -20,13 +27,9 @@ public class MiniMap : MonoBehaviour
     int _textureH;
     Texture _dstTexture;
 
-    public GameObject tower;
-
     GraphicRaycaster m_Raycaster;
     PointerEventData m_PointerEventData;
     EventSystem m_EventSystem;
-
-    Vector2 maxScreen;
 
     private void Awake()
     {
@@ -40,7 +43,6 @@ public class MiniMap : MonoBehaviour
         _textureH = mapH;
 
         zoneSize = zone.GetComponent<Collider>().bounds.size;
-        zoneCenter = zone.GetComponent<Transform>().position;
         _zoneNewOrigin = new Vector3(0 - zoneSize[0] / 2, 0, 0 - zoneSize[2] / 2);
 
         m_Raycaster = GetComponent<GraphicRaycaster>();
@@ -72,6 +74,10 @@ public class MiniMap : MonoBehaviour
                 Debug.Log("Hit " + result.gameObject.name + " " + point + " " + pointInMap);
             }
         }
+
+
+        _texture.Apply();
+        label.GetComponent<RawImage>().texture = _texture;
     }
 
     void InitTexture()
@@ -91,22 +97,33 @@ public class MiniMap : MonoBehaviour
                 _texture.SetPixel(i, j, _color);
             }
         }
-
-        int[] towerPosInTexture = GetCoordinateInTexture(tower.GetComponent<Transform>().position);
-        Debug.Log($"{towerPosInTexture[0]}, {towerPosInTexture[1]}");
-        for (int i = -5; i <= 5; i++)
+    }
+    public void DrawOnMiniMap(DrawInfo box)=>DrawOnMiniMap(box.point, box.cubeSize, box.color);
+    /// <summary>
+    /// Draw a cube to miniMap corresponding to location in world coordinate
+    /// </summary>
+    /// <param name="point">position in world coordinate</param>
+    /// <param name="cubeSize">how many pixel at side of cube</param>
+    /// <param name="color">color of cube in miniMap</param>
+    public void DrawOnMiniMap(Vector3 point, int cubeSize, Color color)
+    {
+        cubeSize = (cubeSize % 2 == 1) ? cubeSize : cubeSize + 1;
+        int[] towerPosInTexture = GetCoordinateInTexture(point);
+        for (int i = -cubeSize / 2; i <= cubeSize / 2; i++)
         {
-            for (int j = -5; j <= 5; j++)
+            for (int j = -cubeSize / 2; j <= cubeSize / 2; j++)
             {
                 int[] fillat = Culling(towerPosInTexture[0] + i, towerPosInTexture[1] + j);
-                _texture.SetPixel(fillat[0], fillat[1], Color.red);
+                _texture.SetPixel(fillat[0], fillat[1], color);
             }
         }
+    }
 
+    public void DrawDone()
+    {
         _texture.Apply();
         label.GetComponent<RawImage>().texture = _texture;
     }
-
     int[] GetCoordinateInTexture(Vector3 pointInWorld)
     {
         int[] result = new int[2];
@@ -116,7 +133,12 @@ public class MiniMap : MonoBehaviour
         result[1] = (int)(shift[2] / zoneSize[2] * _textureH);
         return result;
     }
-
+    /// <summary>
+    /// Check pixel position is on miniMap field
+    /// </summary>
+    /// <param name="x">x-position of pixel at miniMap</param>
+    /// <param name="y">y-position of pixel at miniMap</param>
+    /// <returns></returns>
     int[] Culling(int x, int y)
     {
         int[] result = new int[2];
