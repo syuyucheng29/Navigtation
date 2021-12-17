@@ -8,10 +8,11 @@ public class SeekToTower : MonoBehaviour
     List<GameObject> live = new List<GameObject>();
     public GameObject Zone;
     Vector3 zoneSize, zoneCenter, zoneField;
-    public int numNPC;
+    public int maxNumNPC;
     public GameObject tower;
     Vector3 towerPos;
     float tol;
+    int cNumNPC = 0;
 
     void Awake()
     {
@@ -23,15 +24,25 @@ public class SeekToTower : MonoBehaviour
     {
         towerPos = tower.GetComponent<Transform>().position;
         tol = Mathf.Abs(towerPos[1]);
-        for (int i = 0; i < numNPC; i++)
-        {
-            StartCoroutine(LoadGO("Npc2", SetGO));
-        }
-        new WaitForSeconds(1f);
+        //for (int i = 0; i < numNPC; i++)
+        //{
+        //    StartCoroutine(LoadGO("Npc2", SetGO));
+        //}
     }
 
     void Update()
     {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray r = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (cNumNPC < maxNumNPC && Physics.Raycast(r, out RaycastHit rh, 1000f, 1 << LayerMask.NameToLayer("Terrain")))
+            {
+                cNumNPC++;
+                Debug.Log($"{rh.point}");
+                StartCoroutine(LoadGO("Npc2", new Vector2(rh.point[0], rh.point[2]), SetGO));
+            }
+        }
+
         for (int i = 0; i < live.Count; i++)
         {
             if (live[i].activeSelf)
@@ -48,7 +59,7 @@ public class SeekToTower : MonoBehaviour
             }
         }
     }
-    IEnumerator LoadGO(string sPath, System.Action<GameObject> Act)
+    IEnumerator LoadGO(string sPath, Vector2 inputPoint, System.Action<GameObject, Vector2> Act)
     {
         GameObject go = null;
         ResourceRequest rr = Resources.LoadAsync(sPath);
@@ -60,7 +71,7 @@ public class SeekToTower : MonoBehaviour
         if (rr.isDone && rr.asset != null)
         {
             go = Instantiate(rr.asset) as GameObject;
-            Act(go);
+            Act(go, inputPoint);
         }
     }
     void SetGO(GameObject go)
@@ -69,6 +80,14 @@ public class SeekToTower : MonoBehaviour
         SearchPath(go);
         live.Add(go);
     }
+
+    void SetGO(GameObject go, Vector2 inputPoint)
+    {
+        SetPos(go, inputPoint);
+        SearchPath(go);
+        live.Add(go);
+    }
+
     void SetPos(GameObject go)
     {
         Vector3 pos = new Vector3(
@@ -78,11 +97,22 @@ public class SeekToTower : MonoBehaviour
         go.GetComponent<Transform>().position = pos;
         go.GetComponent<NPC>().motionData.target = pos;
     }
-    void SearchPath(GameObject go)=>navigation.SearchPath(towerPos, go.GetComponent<NPC>().motionData);
+
+    void SetPos(GameObject go, Vector2 inputPoint)
+    {
+        Vector3 pos = new Vector3(
+                inputPoint[0],
+                0,
+                inputPoint[1]);
+        go.GetComponent<Transform>().position = pos;
+        go.GetComponent<NPC>().motionData.target = pos;
+    }
+
+    void SearchPath(GameObject go) => navigation.SearchPath(towerPos, go.GetComponent<NPC>().motionData);
     void Reach(GameObject go)
     {
         float distance = (towerPos - go.GetComponent<Transform>().position).magnitude;
-        if (distance < tol+go.GetComponent<NPC>().motionData.initH)
+        if (distance < tol + go.GetComponent<NPC>().motionData.initH)
         {
             go.SetActive(false);
             go.GetComponent<NPC>().isRequested = false;
