@@ -1167,7 +1167,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 468326331}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.9, y: 0.82, z: -0.6}
+  m_LocalPosition: {x: 3.2, y: 0.82, z: -2.4}
   m_LocalScale: {x: 2, y: 5, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
@@ -4243,6 +4243,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zone: {fileID: 2007730051}
+  camera: {fileID: 963194225}
 --- !u!4 &1344697958 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7128895549130653521, guid: 06f49d52e239d2a44a77ca0a6b76a135, type: 3}
@@ -5185,7 +5186,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 199.53, y: 200}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &1716029235
 MonoBehaviour:
